@@ -1279,6 +1279,22 @@ mod tests {
     // - kex rejection. is in conn though.
 
     #[test]
+    fn test_ml_kem_ek_roundtrip_100x() {
+        use ml_kem::{DecapsulationKey, EncapsulationKey, Key, KeyExport, MlKem768};
+        for i in 0..100 {
+            let mut seed = ml_kem::Seed::default();
+            getrandom::fill(&mut seed.0).unwrap();
+            let dk = DecapsulationKey::<MlKem768>::from_seed(seed);
+            let ek = dk.encapsulation_key();
+            let bytes = ek.to_bytes();
+            let parsed = EncapsulationKey::<MlKem768>::new(&bytes);
+            if let Err(e) = parsed {
+                panic!("iteration {i}: EncapsulationKey::new rejected from_seed-generated ek: {e:?} first16={:02x?}", &bytes.0[..16]);
+            }
+        }
+    }
+
+    #[test]
     fn test_each_kex() {
         for name in fixed_options_kex {
             test_kex_allow(name)

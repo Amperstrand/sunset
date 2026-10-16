@@ -13,7 +13,10 @@ embassy-futures.workspace = true
 embedded-io-async.workspace = true
 portable-atomic.workspace = true
 
-sunset = { workspace = true, features = ["embedded-io"] }
+# default-features = false + the forwarded `mlkem` feature below: embedded
+# consumers can opt the (default-ON) mlkem post-quantum kex out of the
+# binary; std users keep the exact previous feature set by default.
+sunset = { workspace = true, default-features = false, features = ["embedded-io"] }
 
 log.workspace = true
 
@@ -22,6 +25,8 @@ tokio = { workspace = true, optional = true }
 embedded-io-adapters = { workspace = true, optional = true }
 
 [features]
+default = ["mlkem"]
+mlkem = ["sunset/mlkem"]
 # Use a critical-section mutex to lock state. This feature must be enabled
 # to run on executors that require futures to be Send (such as default Tokio).
 # The application should depend on critical-section "std" feature.
